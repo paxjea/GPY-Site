@@ -1,0 +1,58 @@
+# ------------------------------------------------------------------
+#  GPY Journal — CMS configuration (Decap CMS / Sveltia CMS compatible)
+# ------------------------------------------------------------------
+#  This lets George log in at  https://gpylaw.com/admin/  and publish
+#  Journal posts in a browser. Saving commits to content/posts.json in
+#  your Git repo, which triggers Cloudflare Pages to rebuild the site.
+#
+#  Before going live, edit the two placeholders below marked  <-- EDIT
+# ------------------------------------------------------------------
+
+backend:
+  name: github
+  repo: your-github-username/gpylaw-site      # <-- EDIT: owner/repo
+  branch: main
+  # Cloudflare Pages (unlike Netlify) has no built-in login relay, so
+  # point this at your own OAuth worker. See README > "Turn on the CMS".
+  base_url: https://gpy-cms-auth.your-subdomain.workers.dev   # <-- EDIT
+
+# Lets you run the CMS on your own machine with NO auth, for testing:
+#   1) set  local_backend: true   (already set)
+#   2) in the project folder run:  npx decap-server
+#   3) open  http://localhost:8080/admin/  (serve the folder first)
+local_backend: true
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+site_url: https://gpylaw.com
+display_url: https://gpylaw.com
+site_title: George Parker Young, PC
+
+collections:
+  - name: journal
+    label: "Journal"
+    delete: false
+    files:
+      - name: posts
+        label: "Journal posts"
+        file: "content/posts.json"
+        format: json
+        description: "Add, edit, reorder, or remove posts. Newest goes at the top."
+        fields:
+          - name: posts
+            label: "Posts"
+            label_singular: "Post"
+            widget: list
+            summary: "{{fields.title}}  —  {{fields.date}}"
+            fields:
+              - { name: title,   label: "Title", widget: string }
+              - { name: cat,     label: "Category", widget: select, default: "Dispatches",
+                  options: ["Dispatches", "Legal Insights", "Firm News"] }
+              - { name: author,  label: "Author", widget: string, default: "George Parker Young" }
+              - { name: date,    label: "Date", widget: string, hint: "Any format, e.g. June 2022" }
+              - { name: read,    label: "Read time", widget: string, required: false, hint: "e.g. 5 min read" }
+              - { name: excerpt, label: "Excerpt (shown on the card)", widget: text }
+              - { name: body,    label: "Body", widget: text,
+                  hint: "Leave a blank line between paragraphs. Start a line with ## for a subheading." }
+              - { name: id,      label: "ID (optional)", widget: string, required: false }
